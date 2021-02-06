@@ -1,0 +1,68 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<div class="w3-col m3">
+
+    <!--LEFT SECTION: CATEGORIES AND GROUPS-->
+
+    <div class="w3-center w3-padding w3-border rounded-top pg-wheat">
+        <img src="{{ url_for('static', filename='profile_img/' + user.image_file) }}" class="w3-circle w3-image w3-border w3-hover-opacity" style="width:96%;"
+        onclick="document.getElementById('modal01').style.display='block'"/>
+        <div id="modal01" class="w3-modal w3-animate-zoom" onclick="this.style.display='none'">
+            <img src="{{ url_for('static', filename='profile_img/' + user.image_file) }}" class="w3-modal-content" style="width:48%;">
+        </div>
+    </div>
+    <div class="w3-container w3-margin-bottom w3-border pt-2 rounded-bottom bg-white">
+        <div class="w3-center"><p class="w3-large pg-font-bold">{{ user.username }}</p></div>
+        <p>Date Join<span class="w3-opacity ml-2">{{ user.date_joined.strftime('%Y-%m-%d') }}</span></p>
+        <p>Groups:<span class="w3-opacity ml-2">{{ user.groups.count() }}</span></p>
+        <p>Posts:<span class="w3-opacity ml-2">{{ user.posts.count() }}</span></p>
+
+        <p><a href="{{ url_for('users.following', username=user.username) }}">Following:<span class="w3-opacity ml-2">{{ user.followed.count() }}</span></p>
+        <p><a href="{{ url_for('users.followers', username=user.username) }}">Followers:<span class="w3-opacity ml-2">{{ user.followers.count() }}</span></a></p>
+        {% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
+            <p>Follows you</p>
+        {% endif %}
+    </div>
+    {% if current_user.is_authenticated %}
+        {% if user == current_user %}
+            <div>
+                <a href="{{ url_for('users.account') }}" class="w3-btn w3-round pg-tc-white pg-peru pg-header-link">Edit Profile</a>
+            </div>
+        {% else %}
+            {% if current_user.is_following(user) %}
+                <div>
+                    <a href="{{ url_for('users.unfollow', username=user.username) }}" class="w3-btn w3-round pg-tc-white pg-peru pg-header-link">Unfollow</a>
+                </div>
+            {% else %}
+                <div>
+                    <a href="{{ url_for('users.follow', username=user.username) }}" class="w3-btn w3-round pg-tc-white pg-peru pg-header-link">Follow</a>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>
+
+
+<div class="w3-col m6">
+    {% for follower in followed_by %}
+        <div class="bg-white w3-padding w3-row w3-border w3-round w3-margin-bottom">
+            <div class="w3-col" style="width:8%;">
+                <img src="{{ url_for('static', filename='profile_img/' + follower.image_file) }}" class="w3-circle w3-image" style="width:40px;height:40px;"/>
+            </div>
+            <div class="w3-col pl-2" style="width:75%;">
+                <div>
+                    <a href="#" class="font-weight-bold pg-link">{{ follower.username }}</a><br />
+                    <small class="w3-opacity">Date joined 5/7/2009</small>
+                </div>
+            </div>
+            <div class="w3-col" style="width:15%;"><a href="#" class="w3-btn w3-round text-white pg-peru">Follow</a></div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock content %}
+
+
+
+

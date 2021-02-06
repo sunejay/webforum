@@ -1,0 +1,43 @@
+body{background-color: cornsilk;}
+
+
+.pg-link, .pg-header-link, .pg-join, .pg-header-link:hover, .pg-link:hover, .pg-join:hover{
+    text-decoration: none;
+}
+
+.pg-header-link:hover{color: white;}
+.pg-link:hover{color: peru;}
+.pg-more:hover{text-decoration: underline;}
+.pg-pg-link:hover{color: #000;}
+
+.pg-b-text{font-weight: bold;}
+
+
+.pg-wheat{background-color: #fffae6;}
+.pg-peru{background-color: peru;}
+/*.pg-green{background-color: #228B22;}*/
+.pg-tc-peru{color: peru;}
+.pg-btn{background-color:white; border-color: peru; color: peru; padding: 4px 16px 4px 16px; border-radius: 4px;}
+.pg-btn:hover{background-color: peru; color: white;}
+
+.pg-share{height:50px; overflow:auto;}
+
+
+.pg-btn-sm{padding: 4px 8px 4px 8px;}
+
+
+#header-input{width: 60%;}
+.pg-content-section{margin-top: 60px;}
+
+
+.pg-tc-white{color: white;}
+.pg-white{color: white;}
+.pg-bgc-white{background-color: white;}
+
+.pg-pl-1{padding-left: 4px;}
+.pg-pl-2{padding-left: 8px;}
+
+
+
+
+

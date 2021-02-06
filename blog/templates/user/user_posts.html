@@ -1,0 +1,130 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="w3-col m3">
+
+    <!--LEFT SECTION: CATEGORIES AND GROUPS-->
+
+    <div class="w3-center w3-padding w3-border rounded-top pg-wheat">
+        <img src="{{ url_for('static', filename='profile_img/' + user.image_file) }}" class="w3-circle w3-image w3-border w3-hover-opacity" style="width:96%;"
+        onclick="document.getElementById('modal01').style.display='block'"/>
+        <div id="modal01" class="w3-modal w3-animate-zoom" onclick="this.style.display='none'">
+            <img src="{{ url_for('static', filename='profile_img/' + user.image_file) }}" class="w3-modal-content" style="width:48%;">
+        </div>
+    </div>
+    <div class="w3-container w3-margin-bottom w3-border pt-2 rounded-bottom bg-white">
+        <div class="w3-center"><p class="w3-large pg-font-bold">{{ user.username }}</p></div>
+        <p>Date Join<span class="w3-opacity ml-2">{{ user.date_joined.strftime('%Y-%m-%d') }}</span></p>
+        <p>Groups:<span class="w3-opacity ml-2">{{ user.groups.count() }}</span></p>
+        <p>Posts:<span class="w3-opacity ml-2">{{ user.posts.count() }}</span></p>
+
+        <p><a href="{{ url_for('users.following', username=user.username) }}">Following:<span class="w3-opacity ml-2">{{ user.followed.count() }}</span></a></p>
+        <p><a href="{{ url_for('users.followers', username=user.username) }}">Followers:<span class="w3-opacity ml-2">{{ user.followers.count() }}</span></a></p>
+        {% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
+            <p>Follows you</p>
+        {% endif %}
+    </div>
+    {% if current_user.is_authenticated %}
+        {% if user == current_user %}
+            <div>
+                <a href="{{ url_for('users.account') }}" class="w3-btn w3-round pg-tc-white pg-peru pg-header-link">Edit Profile</a>
+            </div>
+        {% else %}
+            {% if current_user.is_following(user) %}
+                <div>
+                    <a href="{{ url_for('users.unfollow', username=user.username) }}" class="w3-btn w3-round pg-tc-white pg-peru pg-header-link">Unfollow</a>
+                </div>
+            {% else %}
+                <div>
+                    <a href="{{ url_for('users.follow', username=user.username) }}" class="w3-btn w3-round pg-tc-white pg-peru pg-header-link">Follow</a>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>
+
+
+<div class="w3-col m6">
+    <!--<div class="w3-bar w3-margin-bottom w3-round bg-white border">
+        <a href="#" style="width:50%" class="w3-bar-item w3-button">Posts </a>
+        <a href="#" style="width:50%" class="w3-bar-item w3-button">Status </a>
+    </div>-->
+
+    {% for post in posts %}
+        <div class="w3-container w3-padding w3-margin-bottom w3-border w3-round pg-bgc-white">
+            <div>
+                <a href="{{ url_for('posts.group', name=post.group.name) }}" class="w3-small w3-tag w3-opacity pg-link">{{ post.group.name }}</a> .
+                {% for tag in post.tags %}
+                    <a href="{{ url_for('posts.tag', name=tag.name) }}" class="w3-small w3-tag w3-opacity pg-link">{{ tag.name }}</a>
+                {% endfor %}
+            </div>
+            <div><a href="{{ url_for('posts.post', post_id=post.id) }}" class="pg-b-text pg-link">{{ post.title }}</a></div>
+            <div class="w3-margin-top w3-margin-bottom">
+                <div class="w3-col" style="width:12%;">
+                    <a href="#"><img src="{{ url_for('static', filename='profile_img/' + post.author.image_file) }}" class="w3-circle w3-image" style="width:48px; height:48px;"/></a>
+                </div>
+                <div class="w3-rest">
+                    <a href="{{ url_for('users.user_posts', username=post.author.username) }}" class="pg-link">{{ post.author.username }}</a><br>
+                    <small class="w3-opacity">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+                </div>
+            </div>
+            <div class="w3-justify w3-border-bottom">
+                {% if post.image_file %}
+                    <img src="{{ url_for('static', filename='post_img/' + post.image_file) }}" class="w3-image w3-round w3-margin-bottom" style="width:100%"/>
+                {% endif %}
+                <p> {{ post.content }}</p>
+            </div>
+            <div class="w3-padding">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.has_liked_post(post) %}
+                        <a href="{{ url_for('posts.post_like_action', post_id=post.id, action='unlike') }}" class="w3-margin-right w3-opacity pg-join">Unlike {{ post.likes.count() }}</a>
+                    {% else %}
+                        <a href="{{ url_for('posts.post_like_action', post_id=post.id, action='like') }}" class="w3-margin-right w3-opacity pg-join">Like {{ post.likes.count() }}</a>
+                    {% endif %}
+                {% else %}
+                    <span class="w3-margin-right w3-opacity pg-join">Like {{ post.likes.count() }}</span>
+                {% endif %}
+                <a href="{{ url_for('posts.post', post_id=post.id) }}" class="w3-margin-right w3-opacity pg-join">Reactions {{ post.comments.count() }}</a>
+                {% if current_user.is_authenticated %}
+                    <span class="w3-right w3-margin-left">
+                        <div class="dropdown">
+                            <a href="#" class=" w3-opacity dropdown-toggle" data-toggle="dropdown">
+                              More
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item text-success" href="#">Report</a>
+                                <a class="dropdown-item" href="#">Save</a>
+                                <a class="dropdown-item" href="#">Share</a>
+                                {% if current_user == post.author %}
+                                <a href="{{ url_for('posts.update_post', post_id=post.id) }}" class="dropdown-item">Update</a>
+                                <a href="#" class="dropdown-item" data-toggle="modal" data-target="#deleteModal">Delete</a>
+                                <!--<button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>-->
+                                {% endif %}
+                            </div>
+                          </div>
+                    </span>
+
+                    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="deleteModalLabel">Delete Post?</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
+                                <input class="btn btn-danger" type="submit" value="Delete">
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock content %}
+

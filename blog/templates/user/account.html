@@ -1,0 +1,82 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+    <!--LEFT SECTION: CATEGORIES AND GROUPS-->
+
+    <div class="w3-col m3">
+        <div class="w3-center w3-padding w3-border rounded-top pg-wheat">
+            <img src="{{ img_file }}" class="w3-circle w3-image w3-border w3-hover-opacity" style="width:96%; height:96%;"
+            onclick="document.getElementById('modal01').style.display='block'"/>
+            <div id="modal01" class="w3-modal w3-animate-zoom" onclick="this.style.display='none'">
+                <img src="{{ img_file }}" class="w3-modal-content" style="width:48%;">
+            </div>
+        </div>
+        <div class="w3-container w3-margin-bottom w3-border pt-2 rounded-bottom bg-white">
+            <div class="w3-center w3-large pg-font-bold">{{ current_user.username }}</div>
+            <div class="w3-center"><p class="w3-small w3-opacity">{{ current_user.email }}</p></div>
+            <p>Date Join<span class="w3-opacity ml-2">234</span></p>
+            <p>Posts:<span class="w3-opacity ml-2">234</span></p>
+            <p>Groups:<span class="w3-opacity ml-2">234</span></p>
+            <p>Likes:<span class="w3-opacity ml-2">234</span></p>
+            <p>Reactions:<span class="w3-opacity ml-2">234</span></p>
+            <p>Following:<span class="w3-opacity ml-2">234</span></p>
+            <p>Followers:<span class="w3-opacity ml-2">234</span></p>
+        </div>
+    </div>
+
+<div class="w3-col m6">
+    <div class="w3-container w3-padding w3-border w3-round pg-bgc-white">
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <!--<fieldset class="form-group">-->
+                <!--<legend class="border-bottom mb-4">Update Account</legend>-->
+
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }}
+                    {% if form.username.errors %}
+                        {{ form.username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.username(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.picture.label() }}
+                    {{ form.picture(class="form-control-file") }}
+                    {% if form.picture.errors %}
+                        {% for error in form.picture.errors %}
+                            <span class="text-danger">{{ error }}</span></br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+            <!--</fieldset>-->
+            <div class="form-group">
+                {{ form.submit(class="pg-btn") }}
+            </div>
+        </form>
+    </div>
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            Want to change password? <a href="{{ url_for('users.change_password') }}" class="ml-2">Change password</a>
+        </small>
+    </div>
+</div>
+{% endblock content%}

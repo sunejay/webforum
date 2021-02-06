@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <!--<h1>Search Results</h1>-->
+
+    <div class="w3-col m6 w3-container">
+        {% for post in posts %}
+
+            <div class="w3-container w3-padding w3-border w3-round w3-margin-bottom bg-white">
+                <div class="w3-margin-bottom">
+                    <a href="{{ url_for('posts.post', post_id=post.id) }}" class="font-weight-bold pg-link">{{ post.title }}</a>
+                </div>
+                <div>
+                    <span class="w3-margin-right">By
+                        <a href="{{ url_for('users.user_posts', username=post.author.username) }}" class="pg-link">{{ post.author.username }}</a>
+                    </span>
+                    <span class="w3-opacity w3-small">{{ post.date_posted }}</span>
+                    <span class="w3-right w3-opacity w3-small">Reactions {{ post.comments.count() }}</span>
+                </div>
+            </div>
+
+        {% endfor %}
+    </div>
+
+{% endblock %}

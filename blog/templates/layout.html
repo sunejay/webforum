@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% if title %}
+        <title>Blog {{ title }}</title>
+    {% else %}
+        <title>Blog</title>
+    {% endif %}
+
+    {% block styles %}
+        <!-- Bootstrap CSS -->
+        {{ bootstrap.load_css() }}
+    {% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/w3.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
+</head>
+<body style="background-color:#FFFFF0;">
+ <!--HEADER-->
+    <div class="w3-container w3-top w3-card" style="background-color:#FFFFFF;">
+        <div class="w3-auto">
+            <div class="w3-container w3-padding">
+
+                <div class="w3-half">
+
+
+                    {% if g.search_form %}
+                    <form method="get" action="{{ url_for('main.search') }}">
+                        <a href="{{ url_for('main.home') }}" class="w3-margin-right pg-header-link">BlogForum</a>
+                        <!--<div class="form-group">-->
+                            {{ g.search_form.q(size=20, class="w3-round w3-border-1 pl-2",
+                            id="header-input", type="text", placeholder=g.search_form.q.label.text) }}
+                        <!--</div>-->
+                    </form>
+                    {% endif %}
+
+
+                    <!--<input class="w3-round w3-border-0 pl-2" id="header-input" type="text" placeholder="Search">-->
+                </div>
+                <div class="w3-half">
+                    <div class="w3-right">
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('main.home') }}" class="w3-margin-left w3-hover-opacity pg-header-link">Home</a>
+                            <a href="#" class="w3-margin-left w3-hover-opacity pg-header-link" data-toggle="tooltip" data-trigger="hover" title="Messages">Messages</a>
+                            <a href="#" class="w3-margin-left w3-hover-opacity pg-header-link" data-toggle="tooltip" data-trigger="hover" title="Notifications">Notifications</a>
+
+                            <!--<div class="dropdown">-->
+                                <img src="{{ url_for('static', filename='profile_img/' + current_user.image_file) }}" class="w3-circle w3-margin-left dropdown-toggle" data-toggle="dropdown" style="width:24px; height:24px;"/>
+                                <div class="dropdown-menu">
+                                    <a href="{{ url_for('users.user_posts', username=current_user.username) }}" class="dropdown-item">Profile</a>
+                                    <a href="{{ url_for('users.account') }}" class="dropdown-item">Account</a>
+                                    <a href="{{ url_for('users.logout') }}" class="dropdown-item">Logout</a>
+                                    {% if current_user.is_admin() %}
+                                        <a href="{{ url_for('admin.index') }}" class="dropdown-item">Admin</a>
+                                        <a href="{{ url_for('groups.new_group') }}" class="dropdown-item">Create group</a>
+                                    {% endif %}
+                                </div>
+                            <!--</div>-->
+                        {% else %}
+                            <a href="{{ url_for('users.login') }}" class="w3-margin-left w3-hover-opacity pg-header-link">Login</a>
+                            <a href="{{ url_for('users.register') }}" class="w3-margin-left w3-hover-opacity pg-header-link">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="w3-auto pg-content-section">
+        <div class="w3-row-padding">
+            <!--LEFT NAV SECTION-->
+
+
+            <!--CONTENT SECTION-->
+
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                      {{ message }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+
+                {% block content %} {% endblock %}
+
+
+            <!--RIGHTT NAV SECTION-->
+
+
+        </div>
+    </div>
+
+    {% block scripts %}
+        <!-- Optional JavaScript -->
+        {{ bootstrap.load_js() }}
+    {% endblock %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+
+    <script>
+
+    $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    </script>
+
+    <script>
+    function myFunction(id) {
+      var x = document.getElementById(id);
+      if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+      } else {
+        x.className = x.className.replace(" w3-show", "");
+      }
+    }
+    </script>
+
+    <script>
+    function myFunction2(id) {
+      var x = document.getElementById(id);
+      if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+      } else {
+        x.className = x.className.replace(" w3-show", "");
+      }
+    }
+    </script>
+
+</body>
+</html>

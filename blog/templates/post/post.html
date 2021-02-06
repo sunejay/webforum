@@ -1,0 +1,166 @@
+{% extends 'layout.html' %}
+
+{% if g.search_form %}
+                    <form method="get" action="{{ url_for('main.search') }}">
+                        <a href="{{ url_for('main.home') }}" class="w3-margin-right pg-tc-white pg-header-link">BlogForum</a>
+                        <!--<div class="form-group">-->
+                            {{ g.search_form.q(size=20, class="w3-round w3-border-0 pl-2",
+                            id="header-input", type="text", placeholder=g.search_form.q.label.text) }}
+                        <!--</div>-->
+                    </form>
+
+                    {% endif %}
+
+{% block content %}
+
+<div class="w3-col m8">
+    <div class="w3-container w3-padding w3-margin-bottom border w3-round pg-bgc-white">
+        <div>
+            <a href="{{ url_for('posts.group', name=post.group.name) }}" class="w3-small w3-tag w3-opacity pg-link">{{ post.group.name }}</a> .
+            {% for tag in post.tags %}
+                <a href="{{ url_for('posts.tag', name=tag.name) }}" class="w3-small w3-tag w3-opacity pg-link">{{ tag.name }}</a>
+            {% endfor %}
+        </div>
+        <div class="w3-large pg-b-text">{{ post.title }}</div>
+        <div class="mt-2 mb-2">
+            <div class="w3-col" style="width:9%;">
+                <a href="#"><img src="{{ url_for('static', filename='profile_img/' + post.author.image_file) }}" class="w3-circle w3-image" style="width:42px; height:42px;"/></a>
+            </div>
+            <div class="w3-rest">
+                <a href="{{ url_for('users.user_posts', username=post.author.username) }}" class="pg-link">{{ post.author.username }}</a><br>
+                <small class="w3-opacity">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+            </div>
+        </div>
+        <div class="w3-justify border-bottom">
+            {% if post.image_file %}
+                <img src="{{ url_for('static', filename='post_img/' + post.image_file) }}" class="w3-image w3-round w3-margin-bottom" style="width:100%"/>
+            {% endif %}
+            <p> {{ post.content }}</p>
+        </div>
+        <div class="w3-padding">
+            {% if current_user.is_authenticated %}
+                {% if current_user.has_liked_post(post) %}
+                    <a href="{{ url_for('posts.post_like_action', post_id=post.id, action='unlike') }}" class="w3-margin-right w3-opacity pg-join">Unlike {{ post.likes.count() }}</a>
+                {% else %}
+                    <a href="{{ url_for('posts.post_like_action', post_id=post.id, action='like') }}" class="w3-margin-right w3-opacity pg-join">Likes {{ post.likes.count() }}</a>
+                {% endif %}
+            {% else %}
+                <span class="w3-margin-right w3-opacity pg-join">Like {{ post.likes.count() }}</span>
+            {% endif %}
+            <a href="#" class="w3-margin-right w3-opacity pg-join" onclick="myFunction('Demo1')">React {{ post.comments.count() }}</a>
+        </div>
+    </div>
+    
+
+        <!-- The Modal -->
+    <!--<div class="modal" id="myModal">-->
+        <div id="Demo1" class="w3-container w3-hide">
+        <!--<div class="modal-content">-->
+
+          {% if current_user.is_authenticated %}
+            <div class="w3-container w3-padding border w3-round w3-margin-bottom pg-bgc-white">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    <!--<fieldset class="form-group">-->
+                        <!--<legend class="border-bottom mb-4">Comment</legend>-->
+                        <div class="form-group">
+                            {{ form.content.label(class="form-control-label font-weight-bold") }}
+                            {% if form.content.errors %}
+                                {{ form.content(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.content.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.content(class="form-control form-control-lg") }}
+                            {% endif %}
+                        </div>
+                    <!--</fieldset>-->
+                    <div class="form-group">
+
+                        {{ form.submit(class="btn btn-outline-success") }}
+
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+        </div>
+
+        <!--</div>-->
+
+    <!--</div>-->
+
+</div>
+
+
+<div class="w3-col m8">
+
+    <!--LEFT SECTION: CATEGORIES AND GROUPS-->
+
+    {% for comment in comments %}
+
+            <div class="w3-container w3-padding w3-margin-bottom border w3-round pg-bgc-white">
+
+                <div class="pg-b-text">Re: {{ comment.post.title }}</div>
+                <div class="mt-1 mb-1">
+                    <div class="w3-col" style="width:9%;">
+                        <a href="#"><img src="{{ url_for('static', filename='profile_img/' + comment.author.image_file) }}" class="w3-circle w3-image" style="width:42px; height:42px;"/></a>
+                    </div>
+                    <div class="w3-rest">
+                        <a href="{{ url_for('users.user_posts', username=comment.author.username) }}" class="pg-link">{{ comment.author.username }}</a><br>
+                        <small class="w3-opacity">{{ comment.date_posted.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                </div>
+                <div class="w3-justify border-bottom">
+
+                    {% if comment.comment_id %}
+
+                        <div class="w3-container w3-padding w3-margin-bottom border w3-leftbar w3-round pg-bgc-white">
+                            <div class="w3-margin-bottom">
+                                <div class="w3-col" style="width:9%;">
+                                    <a href="#"><img src="{{ url_for('static', filename='profile_img/' + comment.author.image_file) }}" class="w3-circle w3-image" style="width:42px; height:42px;"/></a>
+                                </div>
+                                <div class="w3-rest">
+                                    <a href="{{ url_for('users.user_posts', username=comment.share.author.username) }}" class="pg-link">{{ comment.share.author.username }}</a><br>
+                                    <small class="w3-opacity">{{ comment.share.date_posted.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                            </div>
+                            <div class="w3-justify">
+                                <p>{{ comment.share.content }}</p>
+                            </div>
+                            <!--<div class="w3-padding">
+                                <a href="#" class="w3-margin-right w3-opacity pg-join">Like</a>
+                                <a href="#" class="w3-margin-right w3-opacity pg-join">Share</a>
+                            </div>-->
+                        </div>
+
+                    {% endif %}
+
+
+                    <p> {{ comment.content }}</p>
+                </div>
+                <div class="w3-padding">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.has_liked_comment(comment) %}
+                            <a href="{{ url_for('posts.comment_like_action', comment_id=comment.id, action='unlike') }}" class="w3-margin-right w3-opacity pg-join">Unlike {{ comment.likes.count() }}</a>
+                        {% else %}
+                            <a href="{{ url_for('posts.comment_like_action', comment_id=comment.id, action='like') }}" class="w3-margin-right w3-opacity pg-join">Like {{ comment.likes.count() }}</a>
+                        {% endif %}
+                    {% else %}
+                        <span class="w3-margin-right w3-opacity pg-join">Like {{ comment.likes.count() }}</span>
+                    {% endif %}
+                    <a href="{{ url_for('posts.share', comment_id=comment.id) }}" class="w3-margin-right w3-opacity pg-join">Reply {{ comment.shares.count() }}</a>
+                </div>
+            </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}
+
+
+
+
+
+
+

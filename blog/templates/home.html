@@ -1,0 +1,168 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<!-- -->
+<div class="w3-col m3">
+    <!-- LEFT SECTION: CATEGORIES AND GROUPS -->
+    {% if current_user.is_authenticated %}
+        <div class="w3-padding w3-card rounded-top pg-wheat">Communities</div>
+    {% else %}
+        <div class="w3-padding w3-card rounded-top pg-wheat">Categories</div>
+    {% endif %}
+    <div class="w3-container w3-card pt-2 rounded-bottom pg-bgc-white">
+        {% if current_user.is_authenticated %}
+            {% for group in current_user.groups %}
+                <p><img src="{{ url_for('static', filename='icon_img/' + group.icon) }}" style="width:16px; height:16px;"/><a href="{{ url_for('posts.group', name=group.name) }}" class="pg-link ml-2">{{ group.name }}</a></p>
+                <!--<p><a href="#" class="pg-link"></a></p>-->
+            {% endfor %}
+        {% else %}
+            {% for cat in cats %}
+                <p><a href="{{ url_for('posts.category', name=cat.name) }}" class="pg-link">{{ cat.name }}</a></p>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+
+<!-- CONTENT SECTION: Content body -->
+
+<div class="w3-col m6">
+    {% if current_user.is_authenticated %}
+        <div class="w3-container w3-padding w3-margin-bottom w3-card w3-round pg-bgc-white">
+            <div class="mb-1">Share Your Opinion</div>
+            <a href="{{ url_for('posts.new_post') }}">
+                <input class="w3-input border w3-margin-bottom w3-round" type="text" placeholder="Write Post" data-toggle="modal" data-target="#myModal"/>
+            </a>
+        </div>
+    {% endif %}
+    {% for post in posts %}
+        <div class="w3-container w3-padding w3-margin-bottom w3-card w3-round pg-bgc-white w3-card">
+            <div>
+                <a href="{{ url_for('posts.group', name=post.group.name) }}" class="w3-small w3-tag w3-opacity pg-link">{{ post.group.name }}</a> .
+                {% for tag in post.tags %}
+                    <a href="{{ url_for('posts.tag', name=tag.name) }}" class="w3-small w3-tag w3-opacity pg-link">{{ tag.name }}</a>
+                {% endfor %}
+            </div>
+            <div><a href="{{ url_for('posts.post', post_id=post.id) }}" class="w3-large pg-b-text pg-link">{{ post.title }}</a></div>
+            <div class="mt-2 mb-2">
+                <div class="w3-col" style="width:9%;">
+                    <a href="{{ url_for('users.user_posts', username=post.author.username) }}">
+                        <img src="{{ url_for('static', filename='profile_img/' + post.author.image_file) }}" class="w3-circle w3-image" style="width:42px; height:42px;"/>
+                    </a>
+                </div>
+                <div class="w3-rest">
+                    <a href="{{ url_for('users.user_posts', username=post.author.username) }}" class="pg-link">{{ post.author.username }}</a><br>
+                    <small class="w3-opacity">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+                </div>
+            </div>
+            <div class="w3-justify border-bottom">
+                {% if post.image_file %}
+                    <img src="{{ url_for('static', filename='post_img/' + post.image_file) }}" class="w3-image w3-round w3-margin-bottom" style="width:100%"/>
+                {% endif %}
+                <p> {{ post.content }}</p>
+            </div>
+            <div class="w3-padding">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.has_liked_post(post) %}
+                        <a href="{{ url_for('posts.post_like_action', post_id=post.id, action='unlike') }}" class="w3-margin-right w3-opacity pg-join">Unlike {{ post.likes.count() }}</a>
+                    {% else %}
+                        <a href="{{ url_for('posts.post_like_action', post_id=post.id, action='like') }}" class="w3-margin-right w3-opacity pg-join">Like {{ post.likes.count() }}</a>
+                    {% endif %}
+                {% else %}
+                    <span class="w3-margin-right w3-opacity pg-join">Like {{ post.likes.count() }}</span>
+                {% endif %}
+                <a href="{{ url_for('posts.post', post_id=post.id) }}" class="w3-margin-right w3-opacity pg-join">React {{ post.comments.count() }}</a>
+                {% if current_user.is_authenticated %}
+                    <span class="w3-right w3-margin-left">
+                        <div class="dropdown">
+                            <a href="#" class=" w3-opacity dropdown-toggle" data-toggle="dropdown">
+                              More
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item text-success" href="#">Report</a>
+                                <a class="dropdown-item" href="#">Save</a>
+                                <a class="dropdown-item" href="#">Share</a>
+                            </div>
+                          </div>
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- RIGHT  -->
+
+<div class="w3-col m3">
+    <div class="w3-padding w3-card rounded-top pg-wheat">
+        <span>Trending Topics</span>
+        <span class="w3-right"><a href="#" class="pg-pg-link">See All</a></span>
+    </div>
+    <div class="w3-container w3-card rounded-bottom w3-margin-bottom pg-bgc-white">
+        {% for topic in topics %}
+            <div class="border-top w3-stretch">
+                <div class="w3-padding">
+                    <a href="{{ url_for('posts.post', post_id=topic.id) }}" class="pg-b-text pg-link">{{ topic.title }}</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if current_user.is_authenticated %}
+        <div class="w3-padding w3-card rounded-top pg-wheat">
+            <span>Suggested</span>
+            <span class="w3-right"><a href="#" class="pg-pg-link">See All</a></span>
+        </div>
+        <div class="w3-container w3-margin-bottom w3-padding w3-card rounded-bottom pg-bgc-white">
+            {% for user in users %}
+                {% if not current_user.is_following(user) and user != current_user %}
+                    <div class="w3-margin-bottom">
+                        <a href="{{ url_for('users.user_posts', username=user.username) }}">
+                            <img src="{{ url_for('static', filename='profile_img/' + user.image_file) }}" class="w3-circle" style="width:24px; height:24px;"/>
+                        </a>
+                        <a href="{{ url_for('users.user_posts', username=user.username) }}" class="pg-link">{{ user.username }}</a>
+                        <span class="w3-right">
+                            <a href="{{ url_for('users.follow', username=user.username) }}" class="w3-btn w3-small w3-round text-white pg-btn-sm pg-peru pg-join">Follow</a>
+                        </span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if current_user.is_authenticated %}
+        <div class="w3-padding w3-card rounded-top pg-wheat">
+            <span>Popular Groups</span>
+            <span class="w3-right"><a href="#" class="pg-pg-link">See All</a></span>
+        </div>
+        <div class="w3-container w3-margin-bottom w3-padding w3-card rounded-bottom pg-bgc-white">
+            {% for group in groups %}
+                {% if not current_user.has_joined(group) %}
+            <!-- for group in groups -->
+                    <div class="w3-margin-bottom">
+                        <img src="{{ url_for('static', filename='icon_img/' + group.icon) }}" style="width:16px; height:16px;"/>
+                        <a href="{{ url_for('posts.group', name=group.name) }}" class="pg-link ml-1">{{ group.name }}</a>
+                        <span class="w3-right">
+                            <a href="{{ url_for('groups.join_action', group_id=group.id, action='join') }}" class="w3-btn w3-small w3-round text-white pg-btn-sm pg-peru pg-join">Join</a>
+                        </span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- #endfor -->
+
+    <div class="w3-container w3-margin-bottom w3-card w3-round pb-2 pg-bgc-white">
+        <a href="#" class="w3-small w3-opacity">About</a> .
+        <a href="#" class="w3-small w3-opacity">Privacy policy</a> .
+        <a href="#" class="w3-small w3-opacity">Cookie policy</a> .
+        <a href="#" class="w3-small w3-opacity">Terms</a> .
+        <a href="#" class="w3-small w3-opacity">Feedback</a> .
+        <a href="#" class="w3-small w3-opacity">Help</a> .
+        <a href="#" class="w3-small w3-opacity">Advert</a> .
+        <a href="#" class="w3-small w3-opacity">Suggest Community</a>
+    </div>
+</div>
+
+{% endblock content %}
+
